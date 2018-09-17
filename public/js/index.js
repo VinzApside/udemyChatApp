@@ -24,5 +24,7 @@ socket.on('newEmail', email => {
 })
 
 socket.on('newMessage', message => {
-  console.log('newMessage', message)
+  console.log('new message :', message)
 })
+
+
