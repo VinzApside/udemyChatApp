@@ -39,13 +39,11 @@ io.on('connection', socket => {
   // socket.broadcast.emit from admin text new user joined
   socket.broadcast.emit('newMessage', generateMessage('Admin', 'a new user joined'))
 
-  socket.on("createMessage", (message) => {
+  socket.on("createMessage", (message, callback) => {
     console.log('create message :', message)
-    io.emit('newMessage', {
-      from: message.from,
-      text: message.text,
-      createAt: new Date().getTime(),
-    });
+    io.emit('newMessage', generateMessage(message.from, message.text));
+
+    callback('This is from the server');
     // envoyé à tout le monde
 
     // socket.broadcast.emit('newMessage', {
