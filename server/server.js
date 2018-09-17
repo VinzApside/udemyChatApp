@@ -18,28 +18,33 @@ io.on('connection', socket => {
     console.log('the user is disconnected')
   })
 
-  socket.emit('newEmail', {
-    // on recupere l'evenement créer dans le js
-    from: 'mike@example.com',
-    text: "hey, what's going on",
-    createAt: 123
-  })
+  // socket.emit('newEmail', {
+  //   // on recupere l'evenement créer dans le js
+  //   from: 'mike@example.com',
+  //   text: "hey, what's going on",
+  //   createAt: 12312
+  // })
 
 
-  socket.on('createEmail', newEmail => {
-    console.log('createEmail', newEmail)
-  })
+  // socket.on('createEmail', newEmail => {
+  //   console.log('createEmail', newEmail)
+  // })
 
-  socket.on("createMessage", (message)=>{
+  socket.on("createMessage", (message) => {
     console.log('create message :', message)
+    io.emit('newMessage', {
+      from: message.from,
+      text: message.text,
+      createAt: new Date().getTime()
+    })
   })
 
-  socket.emit('newMessage',
-  {
-    from: 'john',
-    text:"see you there",
-    createdAt : 123
-  })
+  // socket.emit('newMessage',
+  //   {
+  //     from: 'john',
+  //     text: "see you there",
+  //     createdAt: 123
+  //   })
 })
 
 server.listen(port, () => {
