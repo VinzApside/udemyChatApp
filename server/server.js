@@ -46,12 +46,18 @@ io.on('connection', socket => {
     callback('This is from the server');
     // envoyé à tout le monde
 
+
     // socket.broadcast.emit('newMessage', {
     //   // permet de ne pas envoyer à la personne qui emet mais tous les autres
     //   from: message.from,
     //   text: message.text,
     //   createAt: new Date().getTime()
     // });
+  })
+
+  socket.on("createLocationMessage", (coords) => {
+    console.log(coords);
+    io.emit('newMessage', generateMessage('Admin', `${coords.latitude}, ${coords.longitude}`))
   })
 
   // socket.emit('newMessage',
