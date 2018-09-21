@@ -4,6 +4,7 @@ const socketIO = require('socket.io')
 const http = require('http')
 
 const { generateMessage, generateLocationMessage } = require('./utils/message')
+const { isRealString } = require('../server/utils/validation')
 const publicPath = path.join(__dirname, '../public')
 const port = process.env.PORT || 3000
 const app = express()
@@ -32,12 +33,10 @@ io.on('connection', socket => {
   // })
 
   // socket.emit from admin text welcome to chat-app
-  socket.emit("newMessage",
-    generateMessage('Admin', 'Welcome to chat app')
-  )
+
 
   // socket.broadcast.emit from admin text new user joined
-  socket.broadcast.emit('newMessage', generateMessage('Admin', 'a new user joined'))
+
 
   socket.on("createMessage", (message, callback) => {
     console.log('create message :', message)
@@ -67,6 +66,25 @@ io.on('connection', socket => {
   //     text: "see you there",
   //     createdAt: 123
   //   })
+
+  socket.on('join', (params, callback) => {
+    if (!isRealString(params.name) || !isRealString(params.room)) {
+      callback('Name and room name are required.')
+    }
+
+    socket.join(params.room); //allow join the room
+    //  socket.leave(params.room); // allow to leave the room
+
+    // io.to('the office fans').emit //send a message to the office fans room
+    // socket.broadcast.to('the office fans') //send  a message to everyone expect the emiter
+
+    socket.emit("newMessage",
+      generateMessage('Admin', 'Welcome to chat app')
+    )
+    socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `a new user joined ${params.room}`))
+
+    callback();
+  })
 })
 
 server.listen(port, () => {
