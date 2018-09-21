@@ -21,3 +21,6 @@ let dateTest = moment();
 
 dateTest.subtract(4, 'hours').subtract(34, 'minutes')
 console.log(dateTest.format('h:mm a'));
+
+let someTimeStamp = moment().valueOf();
+console.log(someTimeStamp);
