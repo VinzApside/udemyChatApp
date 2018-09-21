@@ -1,5 +1,25 @@
 let socket = io()
 //  permet de faire connexion entre front et back
+
+function scrollToBottom() {
+  // selectors
+  let messages = jQuery('#messages');
+  let newMessage = messages.children('li:last-child');
+
+  //heights
+  const clientHeight = messages.prop('clientHeight');
+  const scrollTop = messages.prop('scrollTop');
+  const scrollHeight = messages.prop('scrollHeight');
+  const newMessageHeight = newMessage.innerHeight();
+  const lastMessageHeight = newMessage.prev().innerHeight();
+
+  if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
+    // console.log('should scroll');
+    messages.scrollTop(scrollHeight);
+  }
+
+}
+
 socket.on('connect', () => {
   console.log(' the user is connected')
 
@@ -34,6 +54,9 @@ socket.on('newMessage', message => {
   });
 
   jQuery('#messages').append(html);
+
+  //autoscroll
+  scrollToBottom();
 
   // console.log('new message :', message)
 
