@@ -50,8 +50,12 @@ io.on('connection', socket => {
   socket.on("createMessage", (message, callback) => {
     // console.log('create message :', message)
 
-    
-    io.emit('newMessage', generateMessage(message.from, message.text));
+    const user = users.getUser(socket.id);
+
+    if (user && isRealString(message.text)) {
+      io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+    }
+
 
     callback('This is from the server');
     // envoyé à tout le monde
@@ -68,7 +72,10 @@ io.on('connection', socket => {
   socket.on("createLocationMessage", (coords) => {
     console.log(coords);
     //io.emit('newMessage', generateMessage('Admin', `${coords.latitude}, ${coords.longitude}`))
-    io.emit('newLocationMessage', generateLocationMessage('user', coords.latitude, coords.longitude))
+    const user = users.getUser(socket.id);
+    if (user) {
+      io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude))
+    }
   })
 
   // socket.emit('newMessage',
