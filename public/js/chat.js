@@ -44,6 +44,15 @@ socket.on('disconnect', () => {
   console.log('disconnected from server')
 })
 
+socket.on('UpdateUserList', (users) => {
+  // console.log('users list', users);
+  let ol = jQuery('<ol></ol>')
+  users.forEach((user) => {
+    ol.append(jQuery('<li></li>').text(user));
+  });
+  jQuery('#users').html(ol)
+})
+
 socket.on('newEmail', email => {
   // on cree un evenement newEmail
   console.log('new email', email)

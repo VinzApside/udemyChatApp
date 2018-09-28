@@ -3,13 +3,16 @@ const express = require('express')
 const socketIO = require('socket.io')
 const http = require('http')
 
-const { generateMessage, generateLocationMessage } = require('./utils/message')
-const { isRealString } = require('../server/utils/validation')
+const { generateMessage, generateLocationMessage } = require('./utils/message');
+const { isRealString } = require('../server/utils/validation');
+const { Users } = require('./utils/users');
+
 const publicPath = path.join(__dirname, '../public')
 const port = process.env.PORT || 3000
 const app = express()
 const server = http.createServer(app)
 const io = socketIO(server)
+const users = new Users();
 
 app.use(express.static(publicPath))
 
@@ -18,6 +21,12 @@ io.on('connection', socket => {
 
   socket.on('disconnect', () => {
     console.log('the user is disconnected')
+    const user = users.removeUser(socket.id);
+
+    if (user) {
+      io.to(user.room).emit('UpdateUserList', users.getUsersList(user.room));
+      io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left`));
+    }
   })
 
   // socket.emit('newEmail', {
@@ -69,11 +78,16 @@ io.on('connection', socket => {
 
   socket.on('join', (params, callback) => {
     if (!isRealString(params.name) || !isRealString(params.room)) {
-      callback('Name and room name are required.')
+      return callback('Name and room name are required.')
     }
 
     socket.join(params.room); //allow join the room
     //  socket.leave(params.room); // allow to leave the room
+
+    users.removeUser(socket.id);
+    users.addUser(socket.id, params.name, params.room);
+
+    io.to(params.room).emit('UpdateUserList', users.getUsersList(params.room));
 
     // io.to('the office fans').emit //send a message to the office fans room
     // socket.broadcast.to('the office fans') //send  a message to everyone expect the emiter
@@ -81,7 +95,7 @@ io.on('connection', socket => {
     socket.emit("newMessage",
       generateMessage('Admin', 'Welcome to chat app')
     )
-    socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `a new user joined ${params.room}`))
+    socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `${params.name} joined ${params.room}`))
 
     callback();
   })

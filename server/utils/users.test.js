@@ -37,6 +37,7 @@ describe("Users", () => {
 
   it("should remove a user", () => {
     const usersWithout = users.removeUser('1');
+    
     expect(usersWithout).toEqual(["b", "c"])
   })
 
@@ -46,13 +47,15 @@ describe("Users", () => {
   })
 
   it("should find a user", () => {
-    const userFinded = users.getUser("1");
-    expect(userFinded.name).toEqual("a")
+    const userId = '2';
+    const userFinded = users.getUser(userId);
+    expect(userFinded.id).toBe(userId);
   })
 
   it("should not find a user", () => {
-    const userFinded = users.getUser("0");
-    expect(userFinded).toEqual(undefined)
+    const userId = "245"
+    const userFinded = users.getUser(userId);
+    expect(userFinded).toNotExist()
   })
 
   it("should return names for node course", () => {
